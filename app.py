@@ -4,10 +4,6 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 import pandas as pd
 
-# Set up the Streamlit app layout
-st.title("Chat with Database")
-st.subheader("Conversation and Table Augmented Generation")
-
 if "model" not in st.session_state:
   key = st.secrets['gemini_api_key']
   # key = 'AIzaSyBYl0fF5LxGSI1DJ6i7GEF9oBzEO_UXu6I'
@@ -48,12 +44,12 @@ if "bq_client" not in st.session_state:
 bq_client = st.session_state.bq_client
 
 if "query_propmt" not in st.session_state:
-  with open("C:\\Users\\VillaAiAdmin\\Villa-Intelligence\\query_propmt.txt") as f:
+  with open("query_propmt.txt") as f:
     query_propmt = f.read()
   st.session_state.query_propmt = query_propmt
 
 if "explain_propmt" not in st.session_state:
-  with open("C:\\Users\\VillaAiAdmin\\Villa-Intelligence\\explain_propmt.txt") as f:
+  with open("explain_propmt.txt") as f:
     explain_propmt = f.read()
   st.session_state.explain_propmt = explain_propmt
     
@@ -64,14 +60,18 @@ def generate_answer(question):
     response = model.generate_content(st.session_state.query_propmt.format(question=question))
     response_text = response.text.strip()
     query = response_text.replace('```sql','').replace('```','')
-    # df = pd.read_sql_query(query, engine)
+    # df = bq_client.query(query).to_dataframe()
     # results = df.to_string()
     results = 'test'
     response = model.generate_content(st.session_state.explain_propmt.format(question=question, results=results))
     answer = response.text.strip()
     return answer
 
-col1, col2 = st.columns([0.7,0.3])
+# Set up the Streamlit app layout
+st.title("Chat with Database")
+
+col1, col2 = st.columns([0.8,0.2])
+col1.subheader("Conversation and Table Augmented Generation")
 if col2.button("New Chat"):
   st.session_state.history = []
 
