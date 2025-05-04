@@ -62,7 +62,7 @@ def generate_answer(question):
     query = response_text.replace('```sql','').replace('```','')
     # df = bq_client.query(query).to_dataframe()
     # results = df.to_string()
-    results = 'test'
+    results = 'test for gemini'
     response = model.generate_content(st.session_state.explain_propmt.format(question=question, results=results))
     answer = response.text.strip()
     return answer
