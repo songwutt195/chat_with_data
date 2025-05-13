@@ -3,7 +3,6 @@ import google.generativeai as genai
 from google.cloud import bigquery
 from google.oauth2 import service_account
 import pandas as pd
-import db_dtypes
 
 if "model" not in st.session_state:
   key = st.secrets['gemini_api_key']
@@ -69,12 +68,12 @@ def generate_answer(question):
   response = model.generate_content(extract_propmt.format(question=question))
   response_text = response.text.strip()
   steps = response_text.split('**Analysis Steps:**\n\n')[-1]
-  print(steps)
+  
   response = model.generate_content(query_propmt.format(question=question,
                                                         steps=steps))
   response_text = response.text.strip()
   query = response_text.replace('```sql','').replace('```','')
-  print(query)
+  
   df = bq_client.query(query).to_dataframe()
   results = df.to_string()
   
@@ -84,9 +83,15 @@ def generate_answer(question):
   answer = response.text.strip()
   return answer
 
-
 # Set up the Streamlit app layout
 st.title("Chat with Database")
+
+# chat_page = st.Page("chat.py", title="Chatbot")
+# chat_page = st.Page("meta.py", title="Metadata")
+
+# pg = st.navigation([chat_page, chat_page])
+# st.set_page_config(page_title="Data manager", page_icon=":material/edit:")
+# pg.run()
 
 col1, col2 = st.columns([0.8,0.2])
 col1.subheader("Conversation and Table Augmented Generation")
