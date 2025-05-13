@@ -1,3 +1,4 @@
 google-generativeai
 google-cloud-bigquery
 google-auth
+db_dtypes

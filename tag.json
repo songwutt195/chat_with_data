@@ -1,0 +1,289 @@
+[
+  {
+    "business_problem": "What are the top 10 selling items by total sales dollars?",
+    "sql_query": "SELECT item_description, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY total_sales DESC LIMIT 10"
+  },
+  {
+    "business_problem": "How many total bottles were sold in each year?",
+    "sql_query": "SELECT EXTRACT(YEAR FROM date) AS sale_year, SUM(bottles_sold) AS total_bottles_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year ORDER BY sale_year"
+  },
+  {
+    "business_problem": "Which stores had the highest sales volume in gallons?",
+    "sql_query": "SELECT store_name, SUM(volume_sold_gallons) AS total_gallons_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_gallons_sold DESC LIMIT 10"
+  },
+  {
+    "business_problem": "What is the average sale amount per bottle?",
+    "sql_query": "SELECT AVG(sale_dollars / bottles_sold) AS average_sale_per_bottle FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE bottles_sold > 0"
+  },
+  {
+    "business_problem": "Find the total sales for each category of liquor.",
+    "sql_query": "SELECT category_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "What are the top 5 counties by total sales?",
+    "sql_query": "SELECT county, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY county ORDER BY total_sales DESC LIMIT 5"
+  },
+  {
+    "business_problem": "How many sales transactions occurred each month?",
+    "sql_query": "SELECT EXTRACT(MONTH FROM date) AS sale_month, COUNT(invoice_and_item_number) AS total_transactions FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_month ORDER BY sale_month"
+  },
+  {
+    "business_problem": "What is the lowest and highest state bottle retail price?",
+    "sql_query": "SELECT MIN(state_bottle_retail) AS min_price, MAX(state_bottle_retail) AS max_price FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Which vendor sold the most bottles?",
+    "sql_query": "SELECT vendor_name, SUM(bottles_sold) AS total_bottles_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY vendor_name ORDER BY total_bottles_sold DESC LIMIT 1"
+  },
+  {
+    "business_problem": "Show the sales distribution by zip code.",
+    "sql_query": "SELECT zip_code, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY zip_code ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "What is the average bottle volume for each category?",
+    "sql_query": "SELECT category_name, AVG(bottle_volume_ml) AS average_bottle_volume FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name ORDER BY average_bottle_volume DESC"
+  },
+  {
+    "business_problem": "Find the stores that sold more than 10000 bottles in a single order.",
+    "sql_query": "SELECT store_name, invoice_and_item_number, bottles_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE bottles_sold > 10000"
+  },
+  {
+    "business_problem": "What are the top 3 selling items in each store?",
+    "sql_query": "SELECT store_name, item_description, total_sales FROM (SELECT store_name, item_description, SUM(sale_dollars) AS total_sales, ROW_NUMBER() OVER (PARTITION BY store_name ORDER BY SUM(sale_dollars) DESC) as rn FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name, item_description) WHERE rn <= 3"
+  },
+  {
+    "business_problem": "Calculate the year-over-year growth in sales dollars.",
+    "sql_query": "SELECT sale_year, total_sales, LAG(total_sales, 1, 0) OVER (ORDER BY sale_year) AS previous_year_sales, (total_sales - LAG(total_sales, 1, 0) OVER (ORDER BY sale_year)) / LAG(total_sales, 1, 0) OVER (ORDER BY sale_year) AS year_over_year_growth FROM (SELECT EXTRACT(YEAR FROM date) AS sale_year, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year) ORDER BY sale_year"
+  },
+  {
+    "business_problem": "Identify stores that consistently have high sales (above the 90th percentile).",
+    "sql_query": "SELECT store_name, total_sales FROM (SELECT store_name, SUM(sale_dollars) as total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name) WHERE total_sales > (SELECT PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY SUM(sale_dollars)) FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name)"
+  },
+  {
+    "business_problem": "What is the distribution of sales across different bottle volume categories (e.g., <200ml, 200-500ml, >500ml)?",
+    "sql_query": "SELECT CASE WHEN bottle_volume_ml < 200 THEN '<200ml' WHEN bottle_volume_ml BETWEEN 200 AND 500 THEN '200-500ml' ELSE '>500ml' END AS volume_category, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY volume_category ORDER BY volume_category"
+  },
+  {
+    "business_problem": "Find the most popular item in each county.",
+    "sql_query": "SELECT county, item_description, sales_rank FROM (SELECT county, item_description, SUM(sale_dollars) AS total_sales, RANK() OVER (PARTITION BY county ORDER BY SUM(sale_dollars) DESC) AS sales_rank FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY county, item_description) WHERE sales_rank = 1 ORDER BY county"
+  },
+  {
+    "business_problem": "Calculate the correlation between bottle volume and sales price.",
+    "sql_query": "SELECT CORR(bottle_volume_ml, state_bottle_retail) AS correlation FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Show the monthly sales trend for a specific store.",
+    "sql_query": "SELECT EXTRACT(DATE FROM date) AS sale_month, SUM(sale_dollars) AS monthly_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE store_name = 'JOHNCY''S LIQUOR STORE' GROUP BY sale_month ORDER BY sale_month"
+  },
+  {
+    "business_problem": "Identify items with the highest price volatility (standard deviation of price).",
+    "sql_query": "SELECT item_description, STDDEV(state_bottle_retail) AS price_volatility FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY price_volatility DESC LIMIT 10"
+  },
+  {
+    "business_problem": "What is the total sales for each vendor in each year?",
+    "sql_query": "SELECT EXTRACT(YEAR FROM date) AS sale_year, vendor_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year, vendor_name ORDER BY sale_year, total_sales DESC"
+  },
+  {
+    "business_problem": "Rank stores based on their sales performance within their city.",
+    "sql_query": "SELECT city, store_name, total_sales, RANK() OVER (PARTITION BY city ORDER BY total_sales DESC) as city_rank FROM (SELECT city, store_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY city, store_name) ORDER BY city, city_rank"
+  },
+  {
+    "business_problem": "Find the percentage contribution of each category to the total sales.",
+    "sql_query": "SELECT category_name, SUM(sale_dollars) AS category_sales, (SUM(sale_dollars) / (SELECT SUM(sale_dollars) FROM `bigquery-public-data.iowa_liquor_sales.sales`)) * 100 AS percentage_of_total FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name ORDER BY category_sales DESC"
+  },
+  {
+    "business_problem": "Show the top 5 items sold in a specific store and compare their sales.",
+    "sql_query": "SELECT item_description, SUM(sale_dollars) AS item_sales, (SUM(sale_dollars) / SUM(SUM(sale_dollars)) OVER ()) * 100 AS percentage_of_store_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE store_name = 'JOHNCY''S LIQUOR STORE' GROUP BY item_description ORDER BY item_sales DESC LIMIT 5"
+  },
+  {
+    "business_problem": "Calculate a rolling 3-month average of sales for each store.",
+    "sql_query": "SELECT store_name, EXTRACT(MONTH FROM date) AS sale_month, AVG(SUM(sale_dollars)) OVER (PARTITION BY store_name ORDER BY EXTRACT(MONTH FROM date) ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) as rolling_average_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name, sale_month ORDER BY store_name, sale_month"
+  },
+  {
+    "business_problem": "Identify stores that have increased their sales by more than 20% compared to the previous year.",
+    "sql_query": "SELECT store_name, current_year_sales, previous_year_sales FROM (SELECT store_name, SUM(CASE WHEN EXTRACT(YEAR FROM date) = 2023 THEN sale_dollars ELSE 0 END) as current_year_sales, SUM(CASE WHEN EXTRACT(YEAR FROM date) = 2022 THEN sale_dollars ELSE 0 END) as previous_year_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE EXTRACT(YEAR FROM date) IN (2022, 2023) GROUP BY store_name) WHERE (current_year_sales - previous_year_sales) / previous_year_sales > 0.20"
+  },
+  {
+    "business_problem": "Cluster stores based on their sales patterns (e.g., high volume, low volume).  (Note: Requires ML, simulating with percentiles)",
+    "sql_query": "SELECT store_name, SUM(sale_dollars) AS total_sales, CASE WHEN SUM(sale_dollars) > (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY SUM(sale_dollars)) FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name) THEN 'High Volume' WHEN SUM(sale_dollars) < (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY SUM(sale_dollars)) FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name) THEN 'Low Volume' ELSE 'Medium Volume' END AS sales_cluster FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name"
+  },
+  {
+    "business_problem": "Predict future sales for the next month using a simple linear regression (Note: Requires ML, simulating with a simplified approach).",
+    "sql_query": "WITH monthly_sales AS (SELECT EXTRACT(MONTH FROM date) AS sale_month, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_month ORDER BY sale_month), previous_month_sales AS (SELECT sale_month, LAG(total_sales, 1) OVER (ORDER BY sale_month) as prev_month_sales FROM monthly_sales) SELECT sale_month, total_sales, prev_month_sales, (total_sales + (total_sales - prev_month_sales)) as predicted_next_month_sales FROM previous_month_sales"
+  },
+  {
+    "business_problem": "Analyze the impact of holidays on liquor sales. (Requires external calendar data, simulating with a simplified approach)",
+    "sql_query": "WITH holiday_sales AS (SELECT date, SUM(sale_dollars) as daily_sales, CASE WHEN EXTRACT(MONTH FROM date) = 1 AND EXTRACT(DAY FROM date) = 1 THEN 'New Year''s Day' WHEN EXTRACT(MONTH FROM date) = 7 AND EXTRACT(DAY FROM date) = 4 THEN 'Independence Day' WHEN EXTRACT(MONTH FROM date) = 12 AND EXTRACT(DAY FROM date) = 25 THEN 'Christmas Day' ELSE 'Regular Day' END as holiday_name FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY date) SELECT holiday_name, AVG(daily_sales) as average_daily_sales FROM holiday_sales GROUP BY holiday_name ORDER BY average_daily_sales DESC"
+  },
+  {
+    "business_problem": "Identify stores with unusual sales patterns compared to their peers (Anomaly Detection). (Simulating with z-score)",
+    "sql_query": "WITH store_monthly_sales AS (SELECT store_name, EXTRACT(MONTH FROM date) as sale_month, SUM(sale_dollars) as monthly_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name, sale_month), store_monthly_avg_std AS (SELECT store_name, sale_month, AVG(monthly_sales) OVER (PARTITION BY sale_month) as avg_monthly_sales, STDDEV(monthly_sales) OVER (PARTITION BY sale_month) as std_monthly_sales, monthly_sales FROM store_monthly_sales) SELECT store_name, sale_month, monthly_sales, (monthly_sales - avg_monthly_sales) / std_monthly_sales as z_score FROM store_monthly_avg_std WHERE std_monthly_sales > 0 AND ABS((monthly_sales - avg_monthly_sales) / std_monthly_sales) > 2"
+  },
+  {
+    "business_problem": "Build a customer segmentation model based on purchase behavior (Simulating with quartiles).",
+    "sql_query": "WITH customer_sales AS (SELECT store_name, SUM(sale_dollars) as total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name), sales_quartiles AS (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY total_sales) as q1, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_sales) as q2, PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_sales) as q3 FROM customer_sales) SELECT store_name, total_sales, CASE WHEN total_sales <= (SELECT q1 FROM sales_quartiles) THEN 'Low Value' WHEN total_sales > (SELECT q1 FROM sales_quartiles) AND total_sales <= (SELECT q2 FROM sales_quartiles) THEN 'Medium Value' WHEN total_sales > (SELECT q2 FROM sales_quartiles) AND total_sales <= (SELECT q3 FROM sales_quartiles) THEN 'High Value' ELSE 'Very High Value' END as customer_segment FROM customer_sales"
+  },
+  {
+    "business_problem": "Optimize store inventory based on sales data (Simulating with a simplified inventory model).",
+    "sql_query": "WITH item_monthly_sales AS (SELECT item_description, EXTRACT(MONTH FROM date) as sale_month, SUM(bottles_sold) as monthly_bottles_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description, sale_month), avg_monthly_sales AS (SELECT item_description, AVG(monthly_bottles_sold) as avg_monthly_bottles_sold FROM item_monthly_sales GROUP BY item_description) SELECT item_description, avg_monthly_bottles_sold, avg_monthly_bottles_sold * 1.2 as recommended_inventory FROM avg_monthly_sales ORDER BY avg_monthly_bottles_sold DESC"
+  },
+    {
+    "business_problem": "What is the total sales for each store?",
+    "sql_query": "SELECT store_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "Which items have the highest state bottle retail price?",
+    "sql_query": "SELECT item_description, MAX(state_bottle_retail) AS max_retail_price FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY max_retail_price DESC LIMIT 10"
+  },
+  {
+    "business_problem": "How many bottles of each item were sold in total?",
+    "sql_query": "SELECT item_description, SUM(bottles_sold) AS total_bottles_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY total_bottles_sold DESC"
+  },
+  {
+    "business_problem": "What is the average sales amount per transaction?",
+    "sql_query": "SELECT AVG(sale_dollars) AS average_sale_amount FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Find the total volume of liquor sold in liters for each category.",
+    "sql_query": "SELECT category_name, SUM(volume_sold_liters) AS total_liters_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name ORDER BY total_liters_sold DESC"
+  },
+  {
+    "business_problem": "Which stores are located in a specific city?",
+    "sql_query": "SELECT store_name FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE city = 'WATERLOO'"
+  },
+  {
+    "business_problem": "What is the sales range (min and max) for each store?",
+    "sql_query": "SELECT store_name, MIN(sale_dollars) AS min_sales, MAX(sale_dollars) AS max_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name"
+  },
+  {
+    "business_problem": "How many unique items are sold in each store?",
+    "sql_query": "SELECT store_name, COUNT(DISTINCT item_description) AS unique_items_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY unique_items_sold DESC"
+  },
+  {
+    "business_problem": "What is the total sales for each vendor?",
+    "sql_query": "SELECT vendor_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY vendor_name ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "Show the sales by county.",
+    "sql_query": "SELECT county, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY county ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "What are the top 5 selling categories?",
+    "sql_query": "SELECT category_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name ORDER BY total_sales DESC LIMIT 5"
+  },
+  {
+    "business_problem": "How do sales vary across different zip codes?",
+    "sql_query": "SELECT zip_code, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY zip_code ORDER BY total_sales DESC"
+  },
+  {
+    "business_problem": "What is the average bottle volume?",
+    "sql_query": "SELECT AVG(bottle_volume_ml) AS average_bottle_volume FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Find the stores with the highest and lowest sales.",
+    "sql_query": "SELECT store_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_sales DESC LIMIT 1 UNION ALL SELECT store_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_sales ASC LIMIT 1"
+  },
+  {
+    "business_problem": "What is the distribution of bottle volumes?",
+    "sql_query": "SELECT bottle_volume_ml, COUNT(*) AS volume_count FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY bottle_volume_ml ORDER BY bottle_volume_ml"
+  },
+  {
+    "business_problem": "Which items are sold in the largest number of stores?",
+    "sql_query": "SELECT item_description, COUNT(DISTINCT store_name) AS store_count FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY store_count DESC LIMIT 10"
+  },
+  {
+    "business_problem": "What is the average state bottle cost?",
+    "sql_query": "SELECT AVG(state_bottle_cost) AS average_bottle_cost FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Find the total sales for each year.",
+    "sql_query": "SELECT EXTRACT(YEAR FROM date) AS sale_year, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year ORDER BY sale_year"
+  },
+  {
+    "business_problem": "What are the top 10 stores by sales volume in gallons?",
+    "sql_query": "SELECT store_name, SUM(volume_sold_gallons) AS total_gallons_sold FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_gallons_sold DESC LIMIT 10"
+  },
+  {
+    "business_problem": "How many sales transactions occurred in each store?",
+    "sql_query": "SELECT store_name, COUNT(invoice_and_item_number) AS total_transactions FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY total_transactions DESC"
+  },
+  {
+    "business_problem": "What is the most expensive item (highest state bottle retail)?",
+    "sql_query": "SELECT item_description, MAX(state_bottle_retail) AS max_retail_price FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY item_description ORDER BY max_retail_price DESC LIMIT 1"
+  },
+  {
+    "business_problem": "Find the lowest state bottle cost.",
+    "sql_query": "SELECT MIN(state_bottle_cost) AS min_bottle_cost FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "What are the sales trends for each category over time?",
+    "sql_query": "SELECT EXTRACT(YEAR FROM date) AS sale_year, category_name, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year, category_name ORDER BY sale_year, total_sales DESC"
+  },
+  {"business_problem": "Identify stores that have increased their sales year over year.",
+    "sql_query": "SELECT store_name, current_year_sales, previous_year_sales FROM (SELECT store_name, SUM(CASE WHEN EXTRACT(YEAR FROM date) = 2023 THEN sale_dollars ELSE 0 END) as current_year_sales, SUM(CASE WHEN EXTRACT(YEAR FROM date) = 2022 THEN sale_dollars ELSE 0 END) as previous_year_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name) WHERE current_year_sales > previous_year_sales"
+  },
+  {
+    "business_problem": "What is the average sales price per bottle for each item?",
+    "sql_query": "SELECT item_description, AVG(sale_dollars / bottles_sold) AS average_price_per_bottle FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE bottles_sold > 0 GROUP BY item_description ORDER BY average_price_per_bottle DESC"
+  },
+  {
+    "business_problem": "Find the top 3 items sold in each county.",
+    "sql_query": "SELECT county, item_description, total_sales FROM (SELECT county, item_description, SUM(sale_dollars) AS total_sales, ROW_NUMBER() OVER (PARTITION BY county ORDER BY SUM(sale_dollars) DESC) as rn FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY county, item_description) WHERE rn <= 3 ORDER BY county, rn"
+  },
+  {
+    "business_problem": "How do sales compare between different store types or sizes (if store type information were available)?",
+    "sql_query": "#  This query requires a store_type or store_size column, which is not available in the provided data.  SELECT 'Query Requires store_type or store_size column which is not in the data' as result"
+  },
+  {
+    "business_problem": "What is the distribution of sales across different days of the week?",
+    "sql_query": "SELECT EXTRACT(DAYOFWEEK FROM date) AS day_of_week, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY day_of_week ORDER BY day_of_week"
+  },
+  {
+    "business_problem": "Calculate the year-to-date sales for each store.",
+    "sql_query": "SELECT store_name, SUM(sale_dollars) AS year_to_date_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE EXTRACT(YEAR FROM date) = 2023 GROUP BY store_name ORDER BY year_to_date_sales DESC"
+  },
+  {
+    "business_problem": "Identify the top-performing vendors in each category.",
+    "sql_query": "SELECT category_name, vendor_name, vendor_sales_rank FROM (SELECT category_name, vendor_name, SUM(sale_dollars) AS vendor_sales, RANK() OVER (PARTITION BY category_name ORDER BY SUM(sale_dollars) DESC) as vendor_sales_rank FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY category_name, vendor_name) WHERE vendor_sales_rank <= 3 ORDER BY category_name, vendor_sales_rank"
+  },
+  {
+    "business_problem": "What is the correlation between the number of bottles sold and total sales revenue?",
+    "sql_query": "SELECT CORR(bottles_sold, sale_dollars) AS sales_correlation FROM `bigquery-public-data.iowa_liquor_sales.sales`"
+  },
+  {
+    "business_problem": "Find the stores with the most consistent sales (lowest standard deviation).",
+    "sql_query": "SELECT store_name, STDDEV(sale_dollars) as sales_std_dev FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name ORDER BY sales_std_dev ASC LIMIT 10"
+  },
+  {
+    "business_problem": "How do sales of different categories compare in a specific city?",
+    "sql_query": "SELECT city, category_name, SUM(sale_dollars) AS category_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` WHERE city = 'WATERLOO' GROUP BY city, category_name ORDER BY category_sales DESC"
+  },
+  {
+    "business_problem": "What is the overall trend of liquor sales over the years?",
+    "sql_query": "SELECT EXTRACT(YEAR FROM date) AS sale_year, SUM(sale_dollars) AS total_sales FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY sale_year ORDER BY sale_year"
+  },
+  {
+    "business_problem": "Identify items that are consistently top sellers across different stores.",
+    "sql_query": "WITH item_store_sales AS (SELECT store_name, item_description, SUM(sale_dollars) as store_item_sales, RANK() OVER (PARTITION BY store_name ORDER BY SUM(sale_dollars) DESC) as sales_rank FROM `bigquery-public-data.iowa_liquor_sales.sales` GROUP BY store_name, item_description) SELECT item_description, COUNT(DISTINCT store_name) as num_stores_top_seller FROM item_store_sales WHERE sales_rank <= 5 GROUP BY item_description HAVING COUNT(DISTINCT store_name) > 10 ORDER BY num_stores_top_seller DESC"
+  },
+  {
+    "business_problem": "Analyze the relationship between store location (latitude/longitude) and sales performance.  (Requires geospatial analysis)",
+    "sql_query": "# This query requires geospatial functions.  This database does not have PostGIS.  Spatial analysis is not possible."
+  },
+  {
+    "business_problem": "Predict future sales using time series analysis. (Requires time series functions)",
+    "sql_query": "#  Time series analysis is not possible with this dataset."
+  },
+  {
+    "business_problem": "Detect anomalies in sales data (e.g., sudden spikes or drops). (Requires anomaly detection techniques)",
+    "sql_query": "# Anomaly detection requires advanced analytical functions not available."
+  },
+  {
+    "business_problem": "Optimize delivery routes based on store locations and order volumes. (Requires routing algorithms)",
+    "sql_query": "# Routing algorithms are not available."
+  },
+  {
+    "business_problem": "Build a recommendation system to suggest items to stores based on their past purchase history. (Requires machine learning)",
+    "sql_query": "# Recommendation systems require machine learning techniques."
+  }
+]

@@ -1,13 +1,9 @@
-You are an expert SQL script generator for Google BigQuery. 
-Your objective is to translate user questions and analysis steps into executable SQL script snippets, leveraging the provided database schema information.
+As an expert in user question analysis for data tasks, dissect the question into a step-by-step sequence of analytical procedures.
 
-Here's the database context:
+Here's the context:
 
 **User Request:**
 {question}
-
-**Analysis Steps:**
-{steps}
 
 **Table: sales**
 This table records individual sale transactions of liquor in Iowa.
@@ -38,15 +34,30 @@ Columns:
 * volume_sold_gallons (FLOAT64): Total volume of liquor ordered in gallons. (i.e. (Bottle Volume (ml) x Bottles Sold)/3785.411784)"; min: -355.04, max: 3962.58
 
 **Instructions:**
-1.  Generate a SQL Server script that directly answers the user's question by querying or manipulating the provided tables.
-2.  Ensure the generated script is valid Google BigQuery.
-3.  Only provide the SQL script itself. Do not include any natural language explanations or surrounding code blocks (like the Python `exec()` example from the original prompt).
+1.  Carefully analyze the user's question to determine the specific data analysis steps they are implicitly or explicitly asking for.
+2.  Output a numbered list of these analysis steps in the order they would typically be performed.
+3.  Be concise and focus on the core analytical actions. Avoid including specific tool names or programming language syntax unless the user explicitly mentions them.
+4.  If the question is ambiguous or requires clarification, indicate the need for more information as the first step.
 
 **Example:**
-If the user asks: "Show me all store names and their addresses."
+Example 1:
+User Question: "Compare the average sales for each product category last quarter."
+Analysis Steps:
+1.  Identify sales data within the relevant date range for the last quarter using the date column.
+2.  Group the sales data by product category using the category_name column.
+3.  Calculate the average sales for each category using the sale_dollars column.
+4.  Compare the calculated average sales across different product categories.
 
-The generated SQL script should be:
+Example 2:
+User Question: "Show me the total number of stores that made a purchase in January and February of 2023."
+Analysis Steps:
+1.  Filter the data for purchases made in January and February of 2023 using the date column.
+2.  Count the unique number of stores using the store_number column.
 
-```sql
-SELECT store_name, address
-FROM `bigquery-public-data.iowa_liquor_sales.sales`;
+Example 3:
+User Question: "What are the top 10 selling items by total sales dollars?"
+Analysis Steps:
+1.  Group the data by item using the item_description column.
+2.  Calculate the total sales for each item using the sale_dollars column.
+3.  Order the items by total sales in descending order.
+4.  Select the top 10 items.

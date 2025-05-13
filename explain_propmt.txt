@@ -2,17 +2,22 @@ You are an AI assistant tasked with explaining how a given user question relates
 
 **Context:**
 * **User Question:** {question}
-* **Query Results:** {results} (Present the results in a clear, readable format, such as a table or a list of key-value pairs)
+* **Analysis Steps:** {steps} (A brief, clear description of the analytical task performed to answer the question)
+* **Query Results:** {results} (Present the results in a clear, readable format (use comma for numeric data and 2 digit format), value is in THB, such as a table or a list of key-value pairs)
 
 Based on these results, here's an answer to your question, written in the same language as the original question, along with a summary and my opinions:
-[Your answer to the user's question, directly addressing what they asked.]
-
 **Summary:**
-[A concise summary of the key findings from the query results in relation to the user's question. This summary should also be in the same language as the original "{question}".]
+[A concise summary of the key findings from the query results in relation to the user's question. This summary should also be in the same language as the original question.]
+
+[Your answer to the user's question in table format if applicable, directly addressing what they asked.]
+
+**Analysis Task Explanation:**
+[A concise explanation of the analytical task that was performed to generate the query results. This should clearly link the steps taken to the user's original question and should be in the same language as the original question.]
 
 **My Opinions:**
-[Your insightful opinions and interpretations of the results. This section should also be in the same language as the original "{question}". This could include:]
+[Your insightful opinions and interpretations of the results. This section include name of topics should also be in the same language as the original question. This could include:]
 
 * **Observations:** Noteworthy patterns, trends, or specific data points.
 * **Implications:** What these results might suggest or indicate.
 * **Potential Issues:** Any anomalies, inconsistencies, or areas of concern.
+* **Further Questions:** What additional questions these results raise or what further analysis might be beneficial.

@@ -3,6 +3,7 @@ import google.generativeai as genai
 from google.cloud import bigquery
 from google.oauth2 import service_account
 import pandas as pd
+import db_dtypes
 
 if "model" not in st.session_state:
   key = st.secrets['gemini_api_key']
@@ -43,29 +44,46 @@ if "bq_client" not in st.session_state:
   st.session_state.bq_client = bigquery.Client(credentials=credentials)
 bq_client = st.session_state.bq_client
 
+if "extract_propmt" not in st.session_state:
+  with open("extract_propmt.txt") as f:
+    extract_propmt = f.read()
+  st.session_state.extract_propmt = extract_propmt
+extract_propmt = st.session_state.extract_propmt
+
 if "query_propmt" not in st.session_state:
   with open("query_propmt.txt") as f:
     query_propmt = f.read()
   st.session_state.query_propmt = query_propmt
+query_propmt = st.session_state.query_propmt
 
 if "explain_propmt" not in st.session_state:
   with open("explain_propmt.txt") as f:
     explain_propmt = f.read()
   st.session_state.explain_propmt = explain_propmt
+explain_propmt = st.session_state.explain_propmt
     
 if "history" not in st.session_state:
   st.session_state.history = []
 
 def generate_answer(question):
-    response = model.generate_content(st.session_state.query_propmt.format(question=question))
-    response_text = response.text.strip()
-    query = response_text.replace('```sql','').replace('```','')
-    # df = bq_client.query(query).to_dataframe()
-    # results = df.to_string()
-    results = 'test for gemini'
-    response = model.generate_content(st.session_state.explain_propmt.format(question=question, results=results))
-    answer = response.text.strip()
-    return answer
+  response = model.generate_content(extract_propmt.format(question=question))
+  response_text = response.text.strip()
+  steps = response_text.split('**Analysis Steps:**\n\n')[-1]
+  print(steps)
+  response = model.generate_content(query_propmt.format(question=question,
+                                                        steps=steps))
+  response_text = response.text.strip()
+  query = response_text.replace('```sql','').replace('```','')
+  print(query)
+  df = bq_client.query(query).to_dataframe()
+  results = df.to_string()
+  
+  response = model.generate_content(explain_propmt.format(question=question,
+                                                          steps=steps,
+                                                          results=results))
+  answer = response.text.strip()
+  return answer
+
 
 # Set up the Streamlit app layout
 st.title("Chat with Database")
