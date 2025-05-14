@@ -43,30 +43,38 @@ if "bq_client" not in st.session_state:
   st.session_state.bq_client = bigquery.Client(credentials=credentials)
 bq_client = st.session_state.bq_client
 
-if "extract_prompt" not in st.session_state:
-  with open("prompt_extract.txt") as f:
-    extract_prompt = f.read()
-  st.session_state.extract_prompt = extract_prompt
-extract_prompt = st.session_state.extract_prompt
+# if "extract_prompt" not in st.session_state:
+#   with open("prompt_extract.txt") as f:
+#     extract_prompt = f.read()
+#   st.session_state.extract_prompt = extract_prompt
+# extract_prompt = st.session_state.extract_prompt
+with open("prompt_extract.txt") as f:
+  extract_prompt = f.read()
 
-if "query_prompt" not in st.session_state:
-  with open("prompt_query.txt") as f:
-    query_prompt = f.read()
-  st.session_state.query_prompt = query_prompt
-query_prompt = st.session_state.query_prompt
+# if "query_prompt" not in st.session_state:
+#   with open("prompt_query.txt") as f:
+#     query_prompt = f.read()
+#   st.session_state.query_prompt = query_prompt
+# query_prompt = st.session_state.query_prompt
+with open("prompt_query.txt") as f:
+  query_prompt = f.read()
 
-if "explain_prompt" not in st.session_state:
-  with open("prompt_explain.txt") as f:
-    explain_prompt = f.read()
-  st.session_state.explain_prompt = explain_prompt
-explain_prompt = st.session_state.explain_prompt
+# if "explain_prompt" not in st.session_state:
+#   with open("prompt_explain.txt") as f:
+#     explain_prompt = f.read()
+#   st.session_state.explain_prompt = explain_prompt
+# explain_prompt = st.session_state.explain_prompt
+with open("prompt_explain.txt") as f:
+  explain_prompt = f.read()
 
-if "error_prompt" not in st.session_state:
-  with open("prompt_error.txt") as f:
-    error_prompt = f.read()
-  st.session_state.error_prompt = error_prompt
-error_prompt = st.session_state.error_prompt
-    
+# if "error_prompt" not in st.session_state:
+#   with open("prompt_error.txt") as f:
+#     error_prompt = f.read()
+#   st.session_state.error_prompt = error_prompt
+# error_prompt = st.session_state.error_prompt
+with open("prompt_error.txt") as f:
+  error_prompt = f.read()
+ 
 if "history" not in st.session_state:
   st.session_state.history = []
 
@@ -95,13 +103,6 @@ def generate_answer(question):
 
 # Set up the Streamlit app layout
 st.title("Chat with Database")
-
-# chat_page = st.Page("chat.py", title="Chatbot")
-# chat_page = st.Page("meta.py", title="Metadata")
-
-# pg = st.navigation([chat_page, chat_page])
-# st.set_page_config(page_title="Data manager", page_icon=":material/edit:")
-# pg.run()
 
 col1, col2 = st.columns([0.8,0.2])
 col1.subheader("Conversation and Table Augmented Generation")

@@ -1,11 +1,13 @@
 import streamlit as st
 import pandas as pd
 
-if "simple" not in st.session_state:
-  with open("example.txt") as f:
-    simple = f.read()
-  st.session_state.simple = simple
-simple = st.session_state.simple
+# if "simple" not in st.session_state:
+#   with open("example.txt") as f:
+#     simple = f.read()
+#   st.session_state.simple = simple
+# simple = st.session_state.simple
+with open("example.txt") as f:
+  simple = f.read()
 
 # Set up the Streamlit app layout
 st.title("Chat with Database")
